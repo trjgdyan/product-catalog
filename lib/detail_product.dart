@@ -3,6 +3,12 @@ import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/ic.dart';
 import 'package:iconify_flutter/icons/bi.dart';
 
+import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
+import 'package:android_intent_plus/android_intent.dart';
+import 'package:flutter/services.dart'; // <-- yang ini untuk PlatformException
+import 'dart:convert';
+
 class ProductDetailPage extends StatelessWidget {
   final String image;
   final String name;
@@ -74,23 +80,49 @@ class ProductDetailPage extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    // _buildActionButton(
-                    // Icons.remove_red_eye, 'Coba Produk', Color(0xFF802929)),
                     _buildActionButton(
                         Iconify(
                           Ic.baseline_remove_red_eye,
                           color: Colors.white,
                         ),
                         'Coba Produk',
-                        const Color(0xFF802929)),
+                        const Color(0xFF802929), onPressed: () async {
+                      final response = await http.get(
+                        Uri.parse(
+                            'https://e3a3-114-6-25-184.ngrok-free.app/api/products/1'),
+                      );
 
+                      if (response.statusCode == 200) {
+                        final data = jsonDecode(response.body);
+                        final modelUrl = data['ar_model_url'];
+
+                        final intent = AndroidIntent(
+                          action: 'android.intent.action.VIEW',
+                          package: 'com.google.android.googlequicksearchbox',
+                          data:
+                              'https://arvr.google.com/scene-viewer/1.0?file=$modelUrl&mode=ar_preferred',
+                          arguments: <String, dynamic>{
+                            'browser_fallback_url': modelUrl,
+                          },
+                        );
+
+                        try {
+                          await intent.launch();
+                        } on PlatformException catch (e) {
+                          print('Gagal buka AR Scene Viewer: $e');
+                        }
+                      } else {
+                        print('Gagal ambil URL model');
+                      }
+                    }),
                     _buildActionButton(
-                        Iconify(
-                          Bi.coin,
-                          color: Color(0xFF802929),
-                        ),
-                        'Beli Produk',
-                        const Color(0xFFFF9E02)),
+                      Iconify(
+                        Bi.coin,
+                        color: Color(0xFF802929),
+                      ),
+                      'Beli Produk',
+                      const Color(0xFFFF9E02),
+                    ),
                   ],
                 ),
               ],
@@ -101,9 +133,10 @@ class ProductDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(Widget icon, String text, Color color) {
+  Widget _buildActionButton(Widget icon, String text, Color color,
+      {VoidCallback? onPressed}) {
     return ElevatedButton.icon(
-      onPressed: () {},
+      onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
         shape: RoundedRectangleBorder(
@@ -163,7 +196,7 @@ class ProductDetailPage extends StatelessWidget {
     return RichText(
       text: TextSpan(
         text:
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. ',
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua...',
         style: const TextStyle(
           fontSize: 14,
           color: Colors.black,
