@@ -39,6 +39,8 @@ dependencies:
   model_viewer_plus: ^1.9.2
   url_launcher: ^6.3.1
   android_intent_plus: ^5.3.0
+  ar_flutter_plugin: ^0.7.3
+  vector_math: any
 
 dev_dependencies:
   flutter_test:
