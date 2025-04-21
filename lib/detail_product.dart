@@ -6,7 +6,7 @@ import 'package:iconify_flutter/icons/bi.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:android_intent_plus/android_intent.dart';
-import 'package:flutter/services.dart'; // <-- yang ini untuk PlatformException
+import 'package:flutter/services.dart';
 import 'dart:convert';
 
 class ProductDetailPage extends StatelessWidget {
@@ -89,7 +89,7 @@ class ProductDetailPage extends StatelessWidget {
                         const Color(0xFF802929), onPressed: () async {
                       final response = await http.get(
                         Uri.parse(
-                            'https://e3a3-114-6-25-184.ngrok-free.app/api/products/1'),
+                            'https://ae11-114-6-25-184.ngrok-free.app/api/products/1'),
                       );
 
                       if (response.statusCode == 200) {
